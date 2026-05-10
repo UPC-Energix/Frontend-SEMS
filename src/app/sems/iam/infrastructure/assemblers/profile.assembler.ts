@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ProfileResponse } from '../../../energy-management/infrastructure/response/profile.response';
-import { ProfileResource } from '../../../energy-management/infrastructure/resources/profile.resource';
+import { ProfileResponse } from '../response/profile.response';
+import { ProfileResource } from '../resources/profile.resource';
 
 @Injectable({
   providedIn: 'root'

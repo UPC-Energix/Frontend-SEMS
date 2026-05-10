@@ -4,7 +4,7 @@ import { map, tap } from 'rxjs/operators';
 import { ProfileRepositoryImpl } from '../../infrastructure/repositories/profile-repository.impl';
 import { ProfileStore } from '../state/profile.store';
 import { ProfileAssembler } from '../../infrastructure/assemblers/profile.assembler';
-import { ProfileResource } from '../../../energy-management/infrastructure/resources/profile.resource';
+import { ProfileResource } from '../../infrastructure/resources/profile.resource';
 
 @Injectable({
   providedIn: 'root'

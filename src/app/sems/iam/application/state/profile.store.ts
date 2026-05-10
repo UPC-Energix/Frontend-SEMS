@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ProfileResource } from '../../../energy-management/infrastructure/resources/profile.resource';
+import { ProfileResource } from '../../infrastructure/resources/profile.resource';
 
 @Injectable({
   providedIn: 'root'

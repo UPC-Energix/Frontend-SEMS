@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ProfileRepository } from '../../../energy-management/domain/model/repositories/profile.repository';
-import { ProfileResponse } from '../../infrastructure/response/profile.response';
+import { ProfileRepository } from '../../domain/model/repositories/profile.repository';
+import { ProfileResponse } from '../response/profile.response';
 import { environment } from '../../../../../environments/environments';
 
 const BASE_URL = `${environment.apiUrl}/api/v1/profiles`;
