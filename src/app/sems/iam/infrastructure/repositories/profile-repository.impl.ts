@@ -1,33 +1,23 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ProfileRepository } from '../../domain/model/repositories/profile.repository';
 import { ProfileResponse } from '../response/profile.response';
-import { environment } from '../../../../../environments/environments';
-
-const BASE_URL = `${environment.apiUrl}/api/v1/profiles`;
+import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProfileRepositoryImpl implements ProfileRepository {
+  private readonly profilesUrl = apiGatewayUrl('profiles');
+
   constructor(private http: HttpClient) {}
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem(environment.tokenKey);
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    });
-  }
-
   loadProfile(userId: string): Observable<ProfileResponse> {
-    return this.http.get<ProfileResponse>(`${BASE_URL}/me`, { headers: this.getHeaders() });
+    return this.http.get<ProfileResponse>(`${this.profilesUrl}/me`);
   }
 
   updateProfile(userId: string, request: any): Observable<ProfileResponse> {
-    const headers = this.getHeaders();
-    return this.http.put<ProfileResponse>(`${BASE_URL}/me`, request, { headers });
+    return this.http.put<ProfileResponse>(`${this.profilesUrl}/me`, request);
   }
-
 }

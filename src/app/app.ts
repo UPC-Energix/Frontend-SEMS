@@ -1,7 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -15,25 +14,14 @@ import { HttpClient } from '@angular/common/http';
 export class App implements OnInit {
   protected readonly title = signal('frontend-sems');
 
-  constructor(
-    private translate: TranslateService,
-    private http: HttpClient
-  ) {}
+  constructor(private translate: TranslateService) {}
 
-  ngOnInit() {
-    // Set default language
-    this.translate.setDefaultLang('en');
-    
-    // Load translations manually
-    this.http.get<any>('./i18n/en.json').subscribe({
-      next: (translations) => {
-        this.translate.setTranslation('en ', translations);
-        this.translate.use('en');
-      },
-      error: (error) => {
-        console.error('Error loading translations:', error);
-        this.translate.use('en'); // Fallback to default language
-      }
-    });
+  ngOnInit(): void {
+    const savedLanguage = typeof window !== 'undefined'
+      ? localStorage.getItem('preferred-language')
+      : null;
+
+    this.translate.setDefaultLang('es');
+    this.translate.use(savedLanguage || 'es');
   }
 }

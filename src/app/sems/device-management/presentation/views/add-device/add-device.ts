@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { DevicesService } from '../../../application/services/devices.service';
-import { Device, DeviceStatus } from '../../../domain/model/device.entity';
+import { Device, DeviceProtocol, DeviceStatus } from '../../../domain/model/device.entity';
 
 @Component({
   selector: 'app-add-device',
@@ -14,6 +14,11 @@ import { Device, DeviceStatus } from '../../../domain/model/device.entity';
   styleUrl: './add-device.css'
 })
 export class AddDevice {
+  currentStep = 1;
+  readonly totalSteps = 4;
+  readonly deviceTypes = ['EOS', 'AIR_CONDITIONER', 'REFRIGERATOR', 'TV', 'MICROWAVE', 'LAPTOP', 'SMART_SPEAKER'];
+  readonly protocols = [DeviceProtocol.WIFI, DeviceProtocol.BLUETOOTH];
+
   device: Partial<Device> = {
     id: '',
     name: '',
@@ -21,6 +26,7 @@ export class AddDevice {
     type: '',
     brand: '',
     model: '',
+    protocol: DeviceProtocol.WIFI,
     status: DeviceStatus.OFF,
     realTimeStatus: 'Off',
     lastActive: 'Now',
@@ -61,9 +67,23 @@ export class AddDevice {
     this.router.navigate(['/devices']);
   }
 
+  nextStep(): void {
+    if (!this.isCurrentStepValid()) {
+      this.error = this.translateService.instant('dashboard.devices.addDeviceValidation');
+      return;
+    }
+
+    this.error = null;
+    this.currentStep = Math.min(this.currentStep + 1, this.totalSteps);
+  }
+
+  previousStep(): void {
+    this.error = null;
+    this.currentStep = Math.max(this.currentStep - 1, 1);
+  }
+
   onSave(): void {
-    // Basic validation
-    if (!this.device.name || !this.device.category || !this.device.type) {
+    if (!this.isFormValid()) {
       this.error = this.translateService.instant('dashboard.devices.addDeviceValidation');
       return;
     }
@@ -71,14 +91,14 @@ export class AddDevice {
     this.saving = true;
     this.error = null;
 
-    // Ensure id: try to use timestamp if none provided
     const newDevice: Device = {
       id: this.device.id && this.device.id.toString() || Date.now().toString(),
       name: this.device.name as string,
       category: this.device.category as string,
       type: (this.device.type as string) || 'UNKNOWN',
-      brand: '',
-      model: '',
+      brand: (this.device.brand as string) || '',
+      model: (this.device.model as string) || '',
+      protocol: this.device.protocol,
       status: (this.device.status as any) || 'OFF',
       realTimeStatus: (this.device.realTimeStatus as string) || 'Off',
       lastActive: (this.device.lastActive as string) || 'Now',
@@ -86,20 +106,30 @@ export class AddDevice {
       isActive: this.device.isActive ? 1 : 0
     };
 
-    console.log('AddDevice - Attempting to create device:', newDevice);
-
     this.devicesService.createDevice(newDevice).subscribe({
-      next: (createdDevice) => {
-        console.log('AddDevice - Device created successfully:', createdDevice);
+      next: () => {
         this.saving = false;
-        // Navigate back to devices list (which will reload from API)
         this.router.navigate(['/devices']);
       },
-      error: (err: any) => {
-        console.error('AddDevice - Error creating device:', err);
+      error: () => {
         this.saving = false;
         this.error = this.translateService.instant('dashboard.devices.addDeviceError');
       }
     });
+  }
+
+  private isCurrentStepValid(): boolean {
+    if (this.currentStep === 1) return !!this.device.type;
+    if (this.currentStep === 2) return !!this.device.protocol;
+    if (this.currentStep === 3) return !!this.device.name && !!this.device.category && !!this.device.location;
+    return true;
+  }
+
+  private isFormValid(): boolean {
+    return !!this.device.type
+      && !!this.device.protocol
+      && !!this.device.name
+      && !!this.device.category
+      && !!this.device.location;
   }
 }

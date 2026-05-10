@@ -1,53 +1,41 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { DevicePreference } from '../../domain/model/entities/device-preference.entity';
 import { PreferenceSettings } from '../../domain/model/entities/device-preference.entity';
 import { DevicePreferenceRepository } from '../../domain/model/repositories/device-preference.repository';
 import { DevicePreferenceResponse, DevicePreferenceRequest } from '../response/device-preference.response';
-import { environment } from '../../../../../environments/environments';
+import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DevicePreferenceRepositoryImpl implements DevicePreferenceRepository {
-  private readonly baseUrl = `${environment.apiUrl}/api/v1`;
+  private readonly devicesUrl = apiGatewayUrl('devices');
 
   constructor(private readonly http: HttpClient) { }
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem(environment.tokenKey);
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-    return headers;
-  }
-
   getDevicePreferences(userId: string): Observable<DevicePreference> {
-    const url = `${this.baseUrl}/users/${userId}/preferences`;
+    const url = `${this.devicesUrl}/preferences`;
 
-    return this.http.get<DevicePreferenceResponse>(url, { headers: this.getHeaders() })
+    return this.http.get<DevicePreferenceResponse>(url)
       .pipe(
         map(response => this.mapToDevicePreference(response)),
-        catchError((err) => {
-          console.error('GET preferences failed, returning defaults. Error:', err);
+        catchError(() => {
           return of(this.getDefaultPreferences(userId));
         })
       );
   }
 
   updateDevicePreferences(preferences: DevicePreference): Observable<DevicePreference> {
-    const url = `${this.baseUrl}/users/${preferences.userId}/preferences`;
+    const url = `${this.devicesUrl}/preferences`;
     const requestBody: DevicePreferenceRequest = this.mapToDevicePreferenceRequest(preferences);
-    const headers = this.getHeaders();
 
-    return this.http.put<DevicePreferenceResponse>(url, requestBody.preferences, { headers })
+    return this.http.put<DevicePreferenceResponse>(url, requestBody.preferences)
       .pipe(
         map(response => this.mapToDevicePreference(response)),
         catchError((error) => {
-          console.error('Error updating preferences with PUT:', error);
           return throwError(() => error);
         })
       );

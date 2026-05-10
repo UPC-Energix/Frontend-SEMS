@@ -161,6 +161,7 @@
       "noDevicesMessage": "Agrega tu primer dispositivo para comenzar a monitorear el consumo de energía.",
       "preferences": "Preferencias",
       "addDevice": "Agregar Dispositivo",
+      "loadError": "No pudimos cargar tus dispositivos. IntÃ©ntalo nuevamente.",
       "realTimeStatus": "Estado en Tiempo Real",
       "lastActive": "Última Actividad",
       "alertHistory": "Historial de Alertas",
@@ -180,6 +181,23 @@
       "alerts": {
         "noAlerts": "Sin alertas",
         "phantomLoad": "Alerta de carga fantasma"
+      },
+      "filters": {
+        "search": "Buscar",
+        "searchPlaceholder": "Nombre, tipo, categorÃ­a o ubicaciÃ³n",
+        "status": "Estado",
+        "category": "CategorÃ­a",
+        "location": "UbicaciÃ³n",
+        "all": "Todos",
+        "noResults": "No hay dispositivos que coincidan con los filtros"
+      },
+      "flow": {
+        "typeTitle": "Elige el tipo de dispositivo",
+        "typeHint": "EOS es hardware externo de medicion. SEMS solo lo vincula y monitorea mediante el gateway.",
+        "protocolTitle": "Protocolo de conexion",
+        "protocolHint": "Selecciona el protocolo reportado por el dispositivo o medidor EOS.",
+        "confirmTitle": "Confirma la vinculacion",
+        "eosNote": "EOS sigue siendo hardware externo; el frontend no lo controla directamente."
       },
       "categories": {
         "heating_cooling": "Calefacción y Refrigeración",
@@ -325,6 +343,8 @@
     "retry": "Reintentar",
     "error": "Error",
     "success": "Éxito",
+    "back": "Atras",
+    "next": "Siguiente",
     "status": {
       "on": "ENCENDIDO",
       "off": "APAGADO",

@@ -1,101 +1,60 @@
-// src/app/sems/energy-management/infrastructure/repositories/settings-repository.impl.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { SettingsRepository } from '../../domain/model/repositories/settings.repository';
 import { SettingsResponse } from '../response/settings.response';
 import { SettingsRequest } from '../request/settings.request';
-import { environment } from '../../../../../environments/environments';
+import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
 import { SavingRule } from '../resources/settings.resource';
-
-const BASE_URL = `${environment.apiUrl}/api/v1/settings`;
 
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsRepositoryImpl implements SettingsRepository {
+  private readonly settingsUrl = apiGatewayUrl('settings');
+  private readonly alertsUrl = apiGatewayUrl('alerts');
+
   constructor(private http: HttpClient) { }
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem(environment.tokenKey);
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  }
-
   getUserSettings(userId: string): Observable<SettingsResponse> {
-    // Backend likely infers user from token, but keeping userId if required by specific endpoint design
-    // Based on screenshot: GET /api/v1/settings
-    return this.http.get<SettingsResponse>(`${BASE_URL}`, {
-      headers: this.getHeaders()
-    });
+    return this.http.get<SettingsResponse>(this.settingsUrl);
   }
 
   updateSettings(userId: string, request: SettingsRequest): Observable<SettingsResponse> {
-    // Based on screenshot: PUT /api/v1/settings
-    console.log('Saving settings at:', BASE_URL, 'with body:', request);
-
     if (request.id) {
-      // Update existing settings
-      return this.http.put<SettingsResponse>(`${BASE_URL}`, request, {
-        headers: this.getHeaders()
-      });
-    } else {
-      // Create new settings (if they don't exist)
-      return this.http.post<SettingsResponse>(`${BASE_URL}`, request, {
-        headers: this.getHeaders()
-      });
+      return this.http.put<SettingsResponse>(this.settingsUrl, request);
     }
+
+    return this.http.post<SettingsResponse>(this.settingsUrl, request);
   }
 
-  // Rules Management
   createRule(rule: Partial<SavingRule>): Observable<SavingRule> {
-    // POST /api/v1/settings/rules
-    console.log('SettingsRepository - Creating rule:', JSON.stringify(rule, null, 2));
-    console.log('SettingsRepository - URL:', `${BASE_URL}/rules`);
-    
-    return this.http.post<SavingRule>(`${BASE_URL}/rules`, rule, {
-      headers: this.getHeaders()
-    }).pipe(
-      tap(response => {
-        console.log('SettingsRepository - Rule creation response:', JSON.stringify(response, null, 2));
-      })
-    );
+    return this.http.post<SavingRule>(`${this.alertsUrl}/rules`, rule);
   }
 
   updateRule(ruleId: string, rule: Partial<SavingRule>): Observable<SavingRule> {
-    // PUT /api/v1/settings/rules/{ruleId}
-    return this.http.put<SavingRule>(`${BASE_URL}/rules/${ruleId}`, rule, {
-      headers: this.getHeaders()
-    });
+    return this.http.put<SavingRule>(`${this.alertsUrl}/rules/${ruleId}`, rule);
   }
 
   deleteRule(ruleId: string): Observable<void> {
-    // DELETE /api/v1/settings/rules/{ruleId}
-    return this.http.delete<void>(`${BASE_URL}/rules/${ruleId}`, {
-      headers: this.getHeaders()
-    });
+    return this.http.delete<void>(`${this.alertsUrl}/rules/${ruleId}`);
   }
 
   resetToDefaults(userId: string): Observable<SettingsResponse> {
-    return this.http.post<SettingsResponse>(`${BASE_URL}/reset`, {}, {
-      headers: this.getHeaders()
-    });
+    return this.http.post<SettingsResponse>(`${this.settingsUrl}/reset`, {});
   }
 
   changePassword(userId: string, oldPassword: string, newPassword: string): Observable<void> {
-    return this.http.post<void>(`${BASE_URL}/password`, {
+    return this.http.post<void>(`${this.settingsUrl}/password`, {
       oldPassword,
       newPassword
-    }, {
-      headers: this.getHeaders()
     });
   }
 
   enableTwoFactor(userId: string): Observable<{ qrCode: string; secret: string }> {
     return this.http.post<{ qrCode: string; secret: string }>(
-      `${BASE_URL}/2fa/enable`,
-      {},
-      { headers: this.getHeaders() }
+      `${this.settingsUrl}/2fa/enable`,
+      {}
     );
   }
 }

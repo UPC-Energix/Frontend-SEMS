@@ -1,6 +1,6 @@
 <div class="add-device-container">
   <div class="add-device-header">
-    <button class="back-button" (click)="onCancel()">
+    <button class="back-button" (click)="onCancel()" aria-label="Volver a dispositivos">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="m15 18-6-6 6-6"/>
       </svg>
@@ -9,58 +9,122 @@
   </div>
 
   <div class="add-device-content">
+    <div class="steps" aria-label="Progreso de vinculación">
+      @for (step of [1, 2, 3, 4]; track step) {
+        <span class="step" [class.active]="currentStep === step" [class.done]="currentStep > step">{{ step }}</span>
+      }
+    </div>
+
     <div class="add-device-form">
-      <div class="form-group">
-        <label>{{ 'dashboard.devices.form.name' | translate }}</label>
-        <input type="text" [(ngModel)]="device.name" />
-      </div>
+      @if (currentStep === 1) {
+        <section class="step-panel">
+          <h2>{{ 'dashboard.devices.flow.typeTitle' | translate }}</h2>
+          <p>{{ 'dashboard.devices.flow.typeHint' | translate }}</p>
+          <div class="option-grid">
+            @for (type of deviceTypes; track type) {
+              <button
+                type="button"
+                class="option-button"
+                [class.selected]="device.type === type"
+                (click)="device.type = type">
+                {{ type === 'EOS' ? 'EOS' : type.replace('_', ' ') }}
+              </button>
+            }
+          </div>
+        </section>
+      }
 
-      <div class="form-group">
-        <label>{{ 'dashboard.devices.form.category' | translate }}</label>
-        <input type="text" [(ngModel)]="device.category" />
-      </div>
+      @if (currentStep === 2) {
+        <section class="step-panel">
+          <h2>{{ 'dashboard.devices.flow.protocolTitle' | translate }}</h2>
+          <p>{{ 'dashboard.devices.flow.protocolHint' | translate }}</p>
+          <div class="option-grid two">
+            @for (protocol of protocols; track protocol) {
+              <button
+                type="button"
+                class="option-button"
+                [class.selected]="device.protocol === protocol"
+                (click)="device.protocol = protocol">
+                {{ protocol === 'WIFI' ? 'Wi-Fi' : 'Bluetooth' }}
+              </button>
+            }
+          </div>
+        </section>
+      }
 
-      <div class="form-group">
-        <label>{{ 'dashboard.devices.form.type' | translate }}</label>
-        <input type="text" [(ngModel)]="device.type" />
-      </div>
+      @if (currentStep === 3) {
+        <section class="step-panel form-grid">
+          <div class="form-group">
+            <label for="deviceName">{{ 'dashboard.devices.form.name' | translate }}</label>
+            <input id="deviceName" type="text" [(ngModel)]="device.name" />
+          </div>
 
-      <div class="form-group">
-        <label>{{ 'dashboard.devices.form.status' | translate }}</label>
-        <select [(ngModel)]="device.status">
-          <option value="ON">{{ 'dashboard.devices.status.on' | translate }}</option>
-          <option value="OFF">{{ 'dashboard.devices.status.off' | translate }}</option>
-          <option value="STANDBY">{{ 'dashboard.devices.status.standby' | translate }}</option>
-          <option value="CHARGING">{{ 'dashboard.devices.status.charging' | translate }}</option>
-        </select>
-      </div>
+          <div class="form-group">
+            <label for="deviceCategory">{{ 'dashboard.devices.form.category' | translate }}</label>
+            <input id="deviceCategory" type="text" [(ngModel)]="device.category" />
+          </div>
 
-      <div class="form-group">
-        <label>{{ 'dashboard.devices.form.lastActive' | translate }}</label>
-        <input type="text" [(ngModel)]="device.lastActive" />
-      </div>
+          <div class="form-group">
+            <label for="deviceLocation">{{ 'dashboard.devices.form.location' | translate }}</label>
+            <input id="deviceLocation" type="text" [(ngModel)]="device.location" />
+          </div>
 
-      <div class="form-group">
-        <label>{{ 'dashboard.devices.form.location' | translate }}</label>
-        <input type="text" [(ngModel)]="device.location" />
-      </div>
+          <div class="form-group">
+            <label for="deviceBrand">{{ 'dashboard.devices.form.brand' | translate }}</label>
+            <input id="deviceBrand" type="text" [(ngModel)]="device.brand" />
+          </div>
 
-      <div class="form-group checkbox-group">
-        <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="isActive" /> 
-          <span class="checkbox-text">{{ 'dashboard.devices.form.isActive' | translate }}</span>
-        </label>
-      </div>
+          <div class="form-group">
+            <label for="deviceModel">{{ 'dashboard.devices.form.model' | translate }}</label>
+            <input id="deviceModel" type="text" [(ngModel)]="device.model" />
+          </div>
+
+          <div class="form-group">
+            <label for="deviceStatus">{{ 'dashboard.devices.form.status' | translate }}</label>
+            <select id="deviceStatus" [(ngModel)]="device.status">
+              <option value="ON">{{ 'dashboard.devices.status.on' | translate }}</option>
+              <option value="OFF">{{ 'dashboard.devices.status.off' | translate }}</option>
+              <option value="STANDBY">{{ 'dashboard.devices.status.standby' | translate }}</option>
+              <option value="CHARGING">{{ 'dashboard.devices.status.charging' | translate }}</option>
+            </select>
+          </div>
+        </section>
+      }
+
+      @if (currentStep === 4) {
+        <section class="step-panel">
+          <h2>{{ 'dashboard.devices.flow.confirmTitle' | translate }}</h2>
+          <dl class="summary-list">
+            <div><dt>{{ 'dashboard.devices.form.type' | translate }}</dt><dd>{{ device.type }}</dd></div>
+            <div><dt>{{ 'dashboard.devices.flow.protocolTitle' | translate }}</dt><dd>{{ device.protocol }}</dd></div>
+            <div><dt>{{ 'dashboard.devices.form.name' | translate }}</dt><dd>{{ device.name }}</dd></div>
+            <div><dt>{{ 'dashboard.devices.form.category' | translate }}</dt><dd>{{ device.category }}</dd></div>
+            <div><dt>{{ 'dashboard.devices.form.location' | translate }}</dt><dd>{{ device.location }}</dd></div>
+          </dl>
+          @if (device.type === 'EOS') {
+            <p class="external-note">{{ 'dashboard.devices.flow.eosNote' | translate }}</p>
+          }
+        </section>
+      }
 
       @if (error) {
         <div class="error-message">{{ error }}</div>
       }
 
       <div class="actions-container">
-        <button class="reset-button" (click)="onCancel()">{{ cancelText }}</button>
-        <button class="save-button" (click)="onSave()" [disabled]="saving">
-          {{ saving ? ('common.loading' | translate) : saveText }}
+        <button class="reset-button" (click)="currentStep === 1 ? onCancel() : previousStep()" [disabled]="saving">
+          {{ currentStep === 1 ? cancelText : ('common.back' | translate) }}
         </button>
+
+        @if (currentStep < totalSteps) {
+          <button class="save-button" (click)="nextStep()">
+            {{ 'common.next' | translate }}
+          </button>
+        } @else {
+          <button class="save-button" (click)="onSave()" [disabled]="saving">
+            {{ saving ? ('common.loading' | translate) : saveText }}
+          </button>
+        }
       </div>
     </div>
   </div>

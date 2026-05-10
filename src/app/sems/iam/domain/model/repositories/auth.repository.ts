@@ -16,6 +16,17 @@ export interface AuthRepository {
     user: User;
     tokens: TokenPair;
   }>;
+  register(command: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    address: string;
+  }): Observable<{
+    user: User;
+    tokens: TokenPair;
+  }>;
   logout(token: string): Observable<void>;
   refreshToken(refreshToken: string): Observable<TokenPair>;
   validateToken(token: string): Observable<boolean>;

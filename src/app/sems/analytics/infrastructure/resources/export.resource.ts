@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../../environments/environments';
+import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
 import { 
   ExportDownloadRequest, 
   ExportEmailRequest, 
@@ -19,25 +19,17 @@ import {
   providedIn: 'root'
 })
 export class ExportResource {
-  private readonly apiUrl = `${environment.apiUrl}/api/v1/reports`;
+  private readonly reportsUrl = apiGatewayUrl('reports');
 
   constructor(private http: HttpClient) {}
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem(environment.tokenKey);
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    });
-  }
-
   createExportRequest(reportId: string, format: string): Observable<ExportResponse> {
     const request = { reportId, format };
-    return this.http.post<ExportResponse>(`${this.apiUrl}/create`, request, { headers: this.getHeaders() });
+    return this.http.post<ExportResponse>(`${this.reportsUrl}/exports`, request);
   }
 
   getExportStatus(request: ExportStatusRequest): Observable<ExportResponse> {
-    return this.http.get<ExportResponse>(`${this.apiUrl}/${request.exportId}/status`, { headers: this.getHeaders() });
+    return this.http.get<ExportResponse>(`${this.reportsUrl}/exports/${request.exportId}/status`);
   }
 
   downloadReport(request: ExportDownloadRequest): Observable<Blob> {
@@ -45,10 +37,9 @@ export class ExportResource {
       .set('format', request.format)
       .set('userId', request.userId || '');
 
-    return this.http.get(`${this.apiUrl}/${request.reportId}/download`, {
+    return this.http.get(`${this.reportsUrl}/${request.reportId}/download`, {
       params,
-      responseType: 'blob',
-      headers: this.getHeaders()
+      responseType: 'blob'
     });
   }
 
@@ -57,11 +48,11 @@ export class ExportResource {
       .set('format', request.format)
       .set('userId', request.userId || '');
 
-    return this.http.get<ExportDownloadResponse>(`${this.apiUrl}/${request.reportId}/download-url`, { params, headers: this.getHeaders() });
+    return this.http.get<ExportDownloadResponse>(`${this.reportsUrl}/${request.reportId}/download-url`, { params });
   }
 
   sendReportByEmail(request: ExportEmailRequest): Observable<ExportEmailResponse> {
-    return this.http.post<ExportEmailResponse>(`${this.apiUrl}/send-email`, request, { headers: this.getHeaders() });
+    return this.http.post<ExportEmailResponse>(`${this.reportsUrl}/send-email`, request);
   }
 
   getExportHistory(request?: ExportHistoryRequest): Observable<ExportHistoryResponse> {
@@ -76,10 +67,10 @@ export class ExportResource {
       if (request.offset) params = params.set('offset', request.offset.toString());
     }
 
-    return this.http.get<ExportHistoryResponse>(this.apiUrl, { params, headers: this.getHeaders() });
+    return this.http.get<ExportHistoryResponse>(`${this.reportsUrl}/exports`, { params });
   }
 
   cancelExport(exportId: string): Observable<{ success: boolean }> {
-    return this.http.put<{ success: boolean }>(`${this.apiUrl}/${exportId}/cancel`, {}, { headers: this.getHeaders() });
+    return this.http.put<{ success: boolean }>(`${this.reportsUrl}/exports/${exportId}/cancel`, {});
   }
 }

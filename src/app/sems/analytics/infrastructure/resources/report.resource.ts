@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../../environments/environments';
+import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
 import {
   ReportGenerationRequest,
   ReportFilterRequest
@@ -15,26 +15,17 @@ import {
   providedIn: 'root'
 })
 export class ReportResource {
-  private readonly apiUrl = `${environment.apiUrl}/api/v1/reports`;
+  private readonly reportsUrl = apiGatewayUrl('reports');
+  private readonly analyticsUrl = apiGatewayUrl('analytics');
 
   constructor(private http: HttpClient) { }
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem(environment.tokenKey);
-    console.log('Token found:', token ? 'Yes (length: ' + token.length + ')' : 'No');
-
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    });
-  }
-
   generateReport(request: ReportGenerationRequest): Observable<ReportResponse> {
-    return this.http.post<ReportResponse>(`${this.apiUrl}/generate`, request, { headers: this.getHeaders() });
+    return this.http.post<ReportResponse>(`${this.reportsUrl}/generate`, request);
   }
 
   getReport(id: string): Observable<ReportResponse> {
-    return this.http.get<ReportResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.get<ReportResponse>(`${this.reportsUrl}/${id}`);
   }
 
   getReportHistory(filter?: ReportFilterRequest): Observable<ReportListResponse> {
@@ -51,16 +42,16 @@ export class ReportResource {
       if (filter.offset) params = params.set('offset', filter.offset.toString());
     }
 
-    return this.http.get<ReportListResponse>(this.apiUrl, { params, headers: this.getHeaders() });
+    return this.http.get<ReportListResponse>(this.reportsUrl, { params });
   }
 
   deleteReport(id: string): Observable<{ success: boolean }> {
-    return this.http.delete<{ success: boolean }>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.delete<{ success: boolean }>(`${this.reportsUrl}/${id}`);
   }
 
   getReportData(id: string, includeCharts: boolean = true): Observable<any> {
     const params = new HttpParams().set('includeCharts', includeCharts.toString());
-    return this.http.get(`${this.apiUrl}/${id}/data`, { params, headers: this.getHeaders() });
+    return this.http.get(`${this.reportsUrl}/${id}/data`, { params });
   }
 
   getWeeklyConsumption(userId?: number): Observable<any> {
@@ -68,10 +59,7 @@ export class ReportResource {
     if (userId) {
       params = params.set('userId', userId.toString());
     }
-    return this.http.get<any>(`${environment.apiUrl}/api/v1/reports/weekly-consumption`, {
-      params,
-      headers: this.getHeaders()
-    });
+    return this.http.get<any>(`${this.analyticsUrl}/reports/weekly-consumption`, { params });
   }
 
   getTopDevices(userId?: number): Observable<any> {
@@ -79,9 +67,6 @@ export class ReportResource {
     if (userId) {
       params = params.set('userId', userId.toString());
     }
-    return this.http.get<any>(`${environment.apiUrl}/api/v1/reports/top-devices`, {
-      params,
-      headers: this.getHeaders()
-    });
+    return this.http.get<any>(`${this.analyticsUrl}/ranking/top-devices`, { params });
   }
 }

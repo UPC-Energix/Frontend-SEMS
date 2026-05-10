@@ -5,6 +5,7 @@
   type: string;
   brand: string;
   model: string;
+  protocol?: DeviceProtocol;
   status: DeviceStatus;
   realTimeStatus: string;
   lastActive: string;
@@ -36,4 +37,9 @@ export enum DeviceCategory {
   MAJOR_APPLIANCES = 'Major Appliances',
   ELECTRONICS = 'Electronics',
   OTHER = 'Other'
+}
+
+export enum DeviceProtocol {
+  WIFI = 'WIFI',
+  BLUETOOTH = 'BLUETOOTH'
 }

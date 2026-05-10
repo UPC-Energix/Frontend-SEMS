@@ -161,6 +161,7 @@
       "noDevicesMessage": "Add your first device to start monitoring energy consumption.",
       "preferences": "Preferences",
       "addDevice": "Add Device",
+      "loadError": "We could not load your devices. Please try again.",
       "realTimeStatus": "Real-time Status",
       "lastActive": "Last Active",
       "alertHistory": "Alert History",
@@ -180,6 +181,23 @@
       "alerts": {
         "noAlerts": "No alerts",
         "phantomLoad": "Phantom load alert"
+      },
+      "filters": {
+        "search": "Search",
+        "searchPlaceholder": "Name, type, category or location",
+        "status": "Status",
+        "category": "Category",
+        "location": "Location",
+        "all": "All",
+        "noResults": "No devices match the selected filters"
+      },
+      "flow": {
+        "typeTitle": "Choose device type",
+        "typeHint": "EOS is external metering hardware. SEMS only links and monitors it through the gateway.",
+        "protocolTitle": "Connection protocol",
+        "protocolHint": "Select the protocol reported by the device or EOS meter.",
+        "confirmTitle": "Confirm linking",
+        "eosNote": "EOS remains external hardware; the frontend does not control it directly."
       },
       "categories": {
         "heating_cooling": "Heating & Cooling",
@@ -325,6 +343,8 @@
     "retry": "Retry",
     "error": "Error",
     "success": "Success",
+    "back": "Back",
+    "next": "Next",
     "status": {
       "on": "ON",
       "off": "OFF",

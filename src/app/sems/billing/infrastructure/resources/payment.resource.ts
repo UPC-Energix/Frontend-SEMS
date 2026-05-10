@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../../environments/environments';
+import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
 import {
   CheckoutSessionResponse,
   PaymentResponse,
@@ -18,39 +18,39 @@ import {
   providedIn: 'root'
 })
 export class PaymentResource {
-  private readonly baseUrl = environment.stripeapiurl;
+  private readonly billingUrl = apiGatewayUrl('billing');
 
   constructor(private readonly http: HttpClient) { }
 
   createCheckoutSession(request: CreateCheckoutSessionRequest): Observable<CheckoutSessionResponse> {
     return this.http.post<CheckoutSessionResponse>(
-      `${this.baseUrl}/api/create-checkout-session`,
+      `${this.billingUrl}/stripe/checkout-sessions`,
       request.toJson()
     );
   }
 
   getPaymentHistory(userId: string): Observable<PaymentHistoryResponse> {
     return this.http.get<PaymentHistoryResponse>(
-      `${this.baseUrl}/api/payments/history/${userId}`
+      `${this.billingUrl}/payments/history/${userId}`
     );
   }
 
   getPaymentById(paymentId: string): Observable<PaymentResponse> {
     return this.http.get<PaymentResponse>(
-      `${this.baseUrl}/api/payments/${paymentId}`
+      `${this.billingUrl}/payments/${paymentId}`
     );
   }
 
   createPaymentIntent(request: CreatePaymentIntentRequest): Observable<PaymentIntentResponse> {
     return this.http.post<PaymentIntentResponse>(
-      `${this.baseUrl}/api/payments/create-intent`,
+      `${this.billingUrl}/payments/intents`,
       request.toJson()
     );
   }
 
   confirmPayment(request: ConfirmPaymentRequest): Observable<any> {
     return this.http.post<any>(
-      `${this.baseUrl}/api/payments/confirm`,
+      `${this.billingUrl}/payments/confirmations`,
       request.toJson()
     );
   }
