@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil } from 'rxjs';
 import { PaymentService } from '../../../application/services/payment.service';
-import { DashboardStore } from '../../../energy-monitoring/application/state/dashboard.store';
+import { DashboardStore } from '../../../../energy-monitoring/application/state/dashboard.store';
 import { Payment } from '../../../domain/model/entities/payment.entity';
 
 @Component({
