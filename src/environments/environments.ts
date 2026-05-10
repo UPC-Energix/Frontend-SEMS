@@ -1,8 +1,19 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://theft-muscles-inner-protection.trycloudflare.com',
+  apiGatewayUrl: 'http://localhost:8080/api',
+  endpoints: {
+    auth: '/iam',
+    devices: '/devices',
+    monitoring: '/monitoring',
+    analytics: '/analytics',
+    alerts: '/alerts',
+    billing: '/billing',
+    notifications: '/notifications',
+    profiles: '/profiles',
+    reports: '/reports',
+    settings: '/settings'
+  },
   tokenKey: 'sems_token',
   refreshTokenKey: 'sems_refresh_token',
-  userKey: 'sems_user',
-  stripeapiurl:'https://apistripefinal.onrender.com'
+  userKey: 'sems_user'
 };

@@ -5,9 +5,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { interval, Subscription } from 'rxjs';
-import { AuthControllerService } from '../../../../sems/authentication/application/services/auth-controller.service';
+import { AuthControllerService } from '../../../../sems/iam/application/services/auth-controller.service';
 import { LangSwitcher } from '../lang-switcher/lang-switcher';
-import { NotificationsComponent } from '../../../../sems/notifications/presentation/views/notifications';
+import { NotificationsComponent } from '../../../../sems/alerts/presentation/views/notifications';
 
 
 @Component({
