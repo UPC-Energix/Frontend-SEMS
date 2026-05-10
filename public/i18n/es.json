@@ -328,8 +328,8 @@
     "home": "Inicio",
     "profile": "Perfil",
     "devices": "Dispositivos",
-    "reports": "Reportes",
-    "payments": "Pagos",
+    "reports": "Reports & Analytics",
+    "payments": "Payments & Subscriptions",
     "settings": "Configuración",
     "logout": "Cerrar Sesión"
   },

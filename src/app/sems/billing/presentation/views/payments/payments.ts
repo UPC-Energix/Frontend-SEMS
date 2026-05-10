@@ -14,6 +14,16 @@ import { PaymentService } from '../../../application/services/payment.service';
 import { DashboardStore } from '../../../../energy-monitoring/application/state/dashboard.store';
 import { Payment } from '../../../domain/model/entities/payment.entity';
 
+interface SubscriptionPlan {
+  id: 'free' | 'plus' | 'pro';
+  titleKey: string;
+  subtitleKey: string;
+  price: number;
+  periodKey: string;
+  featureKeys: string[];
+  highlighted: boolean;
+}
+
 @Component({
   selector: 'app-payments',
   standalone: true,
@@ -37,6 +47,50 @@ export class Payments implements OnInit, OnDestroy {
   loading = false;
   estimatedBill = 0;
   paymentHistory: Payment[] = [];
+  selectedPlanId: SubscriptionPlan['id'] = 'free';
+  subscriptionPlans: SubscriptionPlan[] = [
+    {
+      id: 'free',
+      titleKey: 'payments.subscriptions.plans.free.title',
+      subtitleKey: 'payments.subscriptions.plans.free.subtitle',
+      price: 0,
+      periodKey: 'payments.subscriptions.periods.month',
+      featureKeys: [
+        'payments.subscriptions.plans.free.features.monitoring',
+        'payments.subscriptions.plans.free.features.alerts',
+        'payments.subscriptions.plans.free.features.devices'
+      ],
+      highlighted: false
+    },
+    {
+      id: 'plus',
+      titleKey: 'payments.subscriptions.plans.plus.title',
+      subtitleKey: 'payments.subscriptions.plans.plus.subtitle',
+      price: 15,
+      periodKey: 'payments.subscriptions.periods.month',
+      featureKeys: [
+        'payments.subscriptions.plans.plus.features.free',
+        'payments.subscriptions.plans.plus.features.analytics',
+        'payments.subscriptions.plans.plus.features.recommendations',
+        'payments.subscriptions.plans.plus.features.reports'
+      ],
+      highlighted: true
+    },
+    {
+      id: 'pro',
+      titleKey: 'payments.subscriptions.plans.pro.title',
+      subtitleKey: 'payments.subscriptions.plans.pro.subtitle',
+      price: 25,
+      periodKey: 'payments.subscriptions.periods.month',
+      featureKeys: [
+        'payments.subscriptions.plans.pro.features.plus',
+        'payments.subscriptions.plans.pro.features.devices',
+        'payments.subscriptions.plans.pro.features.priority',
+        'payments.subscriptions.plans.pro.features.export'
+      ],
+      highlighted: false
+    }
+  ];
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -86,7 +140,25 @@ export class Payments implements OnInit, OnDestroy {
     }
   }
 
+  selectPlan(plan: SubscriptionPlan): void {
+    this.selectedPlanId = plan.id;
+    this.paymentForm.patchValue({ amount: plan.price });
+
+    if (plan.price === 0) {
+      this.showSuccess(this.translate.instant('payments.subscriptions.messages.freeSelected'));
+    }
+  }
+
+  get selectedPlan(): SubscriptionPlan {
+    return this.subscriptionPlans.find(plan => plan.id === this.selectedPlanId) ?? this.subscriptionPlans[0];
+  }
+
   onSubmit(): void {
+    if (this.selectedPlan.price === 0) {
+      this.showSuccess(this.translate.instant('payments.subscriptions.messages.freeActivated'));
+      return;
+    }
+
     if (this.paymentForm.valid && !this.loading) {
       this.loading = true;
       const amount = this.paymentForm.value.amount;
@@ -142,6 +214,7 @@ export class Payments implements OnInit, OnDestroy {
     switch (status.toLowerCase()) {
       case 'succeeded':
       case 'completed':
+      case 'paid':
         return 'green';
       case 'pending':
         return 'orange';
@@ -150,6 +223,13 @@ export class Payments implements OnInit, OnDestroy {
       default:
         return 'gray';
     }
+  }
+
+  getStatusIcon(status: string): string {
+    const normalizedStatus = status.toLowerCase();
+    return normalizedStatus === 'succeeded' || normalizedStatus === 'completed' || normalizedStatus === 'paid'
+      ? 'check_circle'
+      : 'pending';
   }
 }
 

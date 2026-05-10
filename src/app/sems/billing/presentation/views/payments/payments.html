@@ -4,6 +4,57 @@
     <p class="subtitle">{{ 'payments.subtitle' | translate }}</p>
   </div>
 
+  <section class="subscriptions-section">
+    <div class="section-heading">
+      <h2>{{ 'payments.subscriptions.title' | translate }}</h2>
+      <p>{{ 'payments.subscriptions.subtitle' | translate }}</p>
+    </div>
+
+    <div class="plans-grid">
+      <article
+        *ngFor="let plan of subscriptionPlans"
+        class="plan-card"
+        [class.selected]="selectedPlanId === plan.id"
+        [class.highlighted]="plan.highlighted">
+        <span class="plan-badge" *ngIf="plan.highlighted">
+          {{ 'payments.subscriptions.recommended' | translate }}
+        </span>
+
+        <div class="plan-header">
+          <h3>{{ plan.titleKey | translate }}</h3>
+          <p>{{ plan.subtitleKey | translate }}</p>
+        </div>
+
+        <div class="plan-price">
+          <span class="currency">S/</span>
+          <span class="amount">{{ plan.price }}</span>
+          <span class="period">/{{ plan.periodKey | translate }}</span>
+        </div>
+
+        <ul class="feature-list">
+          <li *ngFor="let featureKey of plan.featureKeys">
+            <mat-icon>check</mat-icon>
+            <span>{{ featureKey | translate }}</span>
+          </li>
+        </ul>
+
+        <button
+          type="button"
+          mat-raised-button
+          color="primary"
+          class="plan-button"
+          (click)="selectPlan(plan)">
+          <mat-icon>{{ selectedPlanId === plan.id ? 'check_circle' : 'workspace_premium' }}</mat-icon>
+          {{
+            selectedPlanId === plan.id
+              ? ('payments.subscriptions.selected' | translate)
+              : ('payments.subscriptions.select' | translate)
+          }}
+        </button>
+      </article>
+    </div>
+  </section>
+
   <div class="content-grid">
     <!-- Payment Form -->
     <mat-card class="payment-card">
@@ -18,6 +69,10 @@
               <div class="bill-details">
                 <span class="bill-label">{{ 'payments.form.estimatedBill' | translate }}</span>
                 <span class="bill-amount">{{ estimatedBill | currency:'USD':'symbol':'1.2-2' }}</span>
+                <span class="selected-plan">
+                  {{ 'payments.subscriptions.currentSelection' | translate }}:
+                  {{ selectedPlan.titleKey | translate }}
+                </span>
               </div>
               <button
                 type="button"
@@ -78,9 +133,9 @@
       <mat-card-content>
         <div class="history-list" *ngIf="paymentHistory.length > 0; else noHistory">
           <div class="history-item" *ngFor="let payment of paymentHistory">
-            <div class="payment-icon">
-              <mat-icon [style.color]="getStatusColor(payment.status)">
-                {{ payment.status === 'succeeded' ? 'check_circle' : 'pending' }}
+              <div class="payment-icon">
+                <mat-icon [style.color]="getStatusColor(payment.status)">
+                {{ getStatusIcon(payment.status) }}
               </mat-icon>
             </div>
             <div class="payment-details">
