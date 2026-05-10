@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 import { Device, DeviceStatus } from '../../domain/model/device.entity';
 import { DeviceRepository } from '../../domain/model/repositories/device.repository';
 import { environment } from '../../../../../environments/environments';
-import { TokenService } from '../../../authentication/infrastructure/services/token.service';
+import { TokenService } from '../../../iam/infrastructure/services/token.service';
 
 // DTO for API communication
 export interface DeviceResponse {

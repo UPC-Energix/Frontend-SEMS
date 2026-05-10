@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environments';
-import { TokenService } from '../../authentication/infrastructure/services/token.service';
+import { TokenService } from '../../iam/infrastructure/services/token.service';
 import { NotificationEntity } from '../domain/model/notifications.entity';
 
 @Injectable({

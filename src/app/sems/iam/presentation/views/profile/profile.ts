@@ -1,8 +1,8 @@
 import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
-import { AuthService } from '../../../../authentication/application/services/auth.service';
-import { User } from '../../../../authentication/domain/model/entities/user.entity';
+import { AuthService } from '../../../application/services/auth.service';
+import { User } from '../../../domain/model/entities/user.entity';
 import { ProfileService } from '../../../application/services/profile.service';
 import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
