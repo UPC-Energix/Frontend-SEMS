@@ -85,7 +85,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
   }
 
   private mapToDevice(response: DeviceResponse): Device {
-    const active = response.active ?? response.isActive ?? response.status === 'ON' ?? false;
+    const active = response.active ?? response.isActive ?? (response.status === 'ON');
 
     return {
       id: response.id?.toString() || '',
