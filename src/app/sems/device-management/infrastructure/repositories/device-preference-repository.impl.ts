@@ -6,39 +6,22 @@ import { DevicePreference } from '../../domain/model/entities/device-preference.
 import { PreferenceSettings } from '../../domain/model/entities/device-preference.entity';
 import { DevicePreferenceRepository } from '../../domain/model/repositories/device-preference.repository';
 import { DevicePreferenceResponse, DevicePreferenceRequest } from '../response/device-preference.response';
-import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DevicePreferenceRepositoryImpl implements DevicePreferenceRepository {
-  private readonly devicesUrl = apiGatewayUrl('devices');
-
   constructor(private readonly http: HttpClient) { }
 
   getDevicePreferences(userId: string): Observable<DevicePreference> {
-    const url = `${this.devicesUrl}/preferences`;
-
-    return this.http.get<DevicePreferenceResponse>(url)
-      .pipe(
-        map(response => this.mapToDevicePreference(response)),
-        catchError(() => {
-          return of(this.getDefaultPreferences(userId));
-        })
-      );
+    return of(this.getDefaultPreferences(userId));
   }
 
   updateDevicePreferences(preferences: DevicePreference): Observable<DevicePreference> {
-    const url = `${this.devicesUrl}/preferences`;
-    const requestBody: DevicePreferenceRequest = this.mapToDevicePreferenceRequest(preferences);
-
-    return this.http.put<DevicePreferenceResponse>(url, requestBody.preferences)
-      .pipe(
-        map(response => this.mapToDevicePreference(response)),
-        catchError((error) => {
-          return throwError(() => error);
-        })
-      );
+    return of({
+      ...preferences,
+      lastUpdated: new Date().toISOString()
+    });
   }
 
   private mapToDevicePreference(response: DevicePreferenceResponse): DevicePreference {

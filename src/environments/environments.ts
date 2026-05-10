@@ -1,6 +1,5 @@
 export const environment = {
   production: false,
-  useMockApi: true,
   apiGatewayUrl: 'http://localhost:8080/api',
   endpoints: {
     auth: '/iam',

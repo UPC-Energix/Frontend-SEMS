@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { apiGatewayUrl } from '../../../core/config/api-gateway.config';
 import { TokenService } from '../../iam/infrastructure/services/token.service';
 import { NotificationEntity } from '../domain/model/notifications.entity';
 
@@ -10,30 +9,34 @@ import { NotificationEntity } from '../domain/model/notifications.entity';
   providedIn: 'root'
 })
 export class NotificationService {
-  private readonly notificationsUrl = apiGatewayUrl('notifications');
-
   constructor(
     private readonly http: HttpClient,
     private readonly tokenService: TokenService
   ) {}
 
   getNotifications(): Observable<NotificationEntity[]> {
-    const currentUser = this.tokenService.getUser();
-    let params = new HttpParams();
-
-    if (currentUser?.id) {
-      params = params.set('userId', currentUser.id);
-    }
-
-    return this.http.get<any[]>(this.notificationsUrl, { params }).pipe(
-      map(items => (Array.isArray(items) ? items : []).map(item => this.mapToNotification(item))),
-      catchError(() => of([]))
-    );
+    return of([
+      this.mapToNotification({
+        id: 1,
+        title: 'Consumo alto',
+        message: 'Pico de consumo detectado: 18%',
+        type: 'warning',
+        timestamp: new Date().toISOString(),
+        isRead: false
+      }),
+      this.mapToNotification({
+        id: 2,
+        title: 'Ahorro activo',
+        message: 'Sistema optimizado ahorrando 12%',
+        type: 'success',
+        timestamp: new Date().toISOString(),
+        isRead: true
+      })
+    ]);
   }
 
   markAsRead(notification: NotificationEntity): Observable<NotificationEntity> {
-    const id = encodeURIComponent(String((notification as any).id));
-    return this.http.put<NotificationEntity>(`${this.notificationsUrl}/${id}/read`, {});
+    return of({ ...notification, isRead: true });
   }
 
   private mapToNotification(item: any): NotificationEntity {

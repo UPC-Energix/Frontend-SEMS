@@ -1,6 +1,6 @@
 import { ApplicationConfig, importProvidersFrom, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { TranslateModule } from '@ngx-translate/core';
 import { routes } from './app.routes';
@@ -8,9 +8,6 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { DEVICE_REPOSITORY_PROVIDER } from './sems/device-management/infrastructure/repositories/device.repository.provider';
 import { DEVICE_PREFERENCE_REPOSITORY_PROVIDER } from './sems/device-management/infrastructure/repositories/device-preference.repository.provider';
 import {provideCharts, withDefaultRegisterables} from 'ng2-charts';
-import { authInterceptor } from './core/interceptors/auth.interceptor';
-import { errorInterceptor } from './core/interceptors/error.interceptor';
-import { mockApiInterceptor } from './core/interceptors/mock-api.interceptor';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 export const appConfig: ApplicationConfig = {
@@ -18,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideCharts(withDefaultRegisterables()),
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([mockApiInterceptor, authInterceptor, errorInterceptor])),
+    provideHttpClient(),
     provideAnimationsAsync(),
     provideClientHydration(withEventReplay()),
     importProvidersFrom(

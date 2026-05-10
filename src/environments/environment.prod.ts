@@ -1,6 +1,5 @@
 export const environment = {
   production: true,
-  useMockApi: true,
   apiGatewayUrl: 'https://api.sems.example.com/api',
   endpoints: {
     auth: '/iam',

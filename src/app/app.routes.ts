@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
-import { publicGuard } from './core/guards/public.guard';
 
 export const routes: Routes = [
   {
@@ -10,7 +8,6 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
-    canActivate: [publicGuard],
     children: [
       {
         path: 'login',
@@ -36,7 +33,6 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    canActivate: [publicGuard],
     loadComponent: () => import('./shared/presentation/layouts/layout-login/layout-login').then(m => m.LayoutLogin),
     children: [
       {
@@ -47,7 +43,6 @@ export const routes: Routes = [
   },
   {
     path: 'register',
-    canActivate: [publicGuard],
     loadComponent: () => import('./shared/presentation/layouts/layout-login/layout-login').then(m => m.LayoutLogin),
     children: [
       {
@@ -58,7 +53,6 @@ export const routes: Routes = [
   },
   {
     path: '',
-    canActivate: [authGuard],
     loadComponent: () => import('./shared/presentation/layouts/layout-home/layout-home').then(m => m.LayoutHome),
     children: [
       {

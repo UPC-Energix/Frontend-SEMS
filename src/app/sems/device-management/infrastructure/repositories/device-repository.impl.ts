@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
 import { Device, DeviceProtocol, DeviceStatus } from '../../domain/model/device.entity';
 import { DeviceRepository } from '../../domain/model/repositories/device.repository';
 
@@ -27,61 +26,132 @@ export interface DeviceResponse {
   providedIn: 'root'
 })
 export class DeviceRepositoryImpl implements DeviceRepository {
-  private readonly devicesUrl = apiGatewayUrl('devices');
+  private devices: DeviceResponse[] = [
+    {
+      id: 1,
+      userId: '1',
+      name: 'Aire acondicionado',
+      category: 'Climatizacion',
+      type: 'HVAC',
+      status: 'ON',
+      location: 'Sala',
+      active: true,
+      brand: 'EcoAir',
+      model: 'A120',
+      protocol: 'WIFI',
+      lastActive: new Date().toISOString()
+    },
+    {
+      id: 2,
+      userId: '1',
+      name: 'Refrigeradora',
+      category: 'Cocina',
+      type: 'Appliance',
+      status: 'ON',
+      location: 'Cocina',
+      active: true,
+      brand: 'HomeFresh',
+      model: 'RF90',
+      protocol: 'WIFI',
+      lastActive: new Date().toISOString()
+    },
+    {
+      id: 3,
+      userId: '1',
+      name: 'Luces dormitorio',
+      category: 'Iluminacion',
+      type: 'Lighting',
+      status: 'OFF',
+      location: 'Dormitorio',
+      active: false,
+      brand: 'Bright',
+      model: 'LED Smart',
+      protocol: 'BLUETOOTH',
+      lastActive: new Date().toISOString()
+    }
+  ];
 
   constructor(private readonly http: HttpClient) {}
 
   getAllDevices(): Observable<Device[]> {
-    return this.http.get<DeviceResponse[]>(this.devicesUrl).pipe(
-      map(responses => responses.map(response => this.mapToDevice(response))),
-      catchError(() => of([]))
-    );
+    return of(this.devices.map(response => this.mapToDevice(response)));
   }
 
   getDeviceById(id: string): Observable<Device | null> {
-    return this.http.get<DeviceResponse>(`${this.devicesUrl}/${id}`).pipe(
-      map(response => this.mapToDevice(response)),
-      catchError(() => of(null))
-    );
+    const device = this.devices.find(item => String(item.id) === id);
+    return of(device ? this.mapToDevice(device) : null);
   }
 
   getDevicesByStatus(status: string): Observable<Device[]> {
-    return this.http.get<DeviceResponse[]>(`${this.devicesUrl}?status=${encodeURIComponent(status)}`).pipe(
-      map(responses => responses.map(response => this.mapToDevice(response))),
-      catchError(() => of([]))
-    );
+    return of(this.devices
+      .filter(item => item.status.toLowerCase() === status.toLowerCase())
+      .map(response => this.mapToDevice(response)));
   }
 
   getDevicesByCategory(category: string): Observable<Device[]> {
-    return this.http.get<DeviceResponse[]>(`${this.devicesUrl}?category=${encodeURIComponent(category)}`).pipe(
-      map(responses => responses.map(response => this.mapToDevice(response))),
-      catchError(() => of([]))
-    );
+    return of(this.devices
+      .filter(item => item.category.toLowerCase() === category.toLowerCase())
+      .map(response => this.mapToDevice(response)));
   }
 
   createDevice(device: Device): Observable<Device> {
-    return this.http.post<DeviceResponse>(`${this.devicesUrl}/link`, this.mapToDeviceRequest(device)).pipe(
-      map(response => this.mapToDevice(response))
-    );
+    const created: DeviceResponse = {
+      id: Date.now(),
+      userId: '1',
+      name: device.name,
+      category: device.category,
+      type: device.type,
+      status: device.status,
+      location: device.location,
+      active: device.isActive === 1,
+      brand: device.brand,
+      model: device.model,
+      protocol: device.protocol,
+      lastActive: new Date().toISOString()
+    };
+    this.devices = [...this.devices, created];
+    return of(this.mapToDevice(created));
   }
 
   updateDevice(device: Device): Observable<Device> {
-    return this.http.put<DeviceResponse>(`${this.devicesUrl}/${device.id}`, this.mapToDeviceRequest(device)).pipe(
-      map(response => this.mapToDevice(response))
-    );
+    const updated: DeviceResponse = {
+      id: device.id,
+      userId: '1',
+      name: device.name,
+      category: device.category,
+      type: device.type,
+      status: device.status,
+      location: device.location,
+      active: device.isActive === 1,
+      brand: device.brand,
+      model: device.model,
+      protocol: device.protocol,
+      lastActive: new Date().toISOString()
+    };
+    this.devices = this.devices.map(item => String(item.id) === device.id ? updated : item);
+    return of(this.mapToDevice(updated));
   }
 
   deleteDevice(id: string): Observable<boolean> {
-    return this.http.delete<void>(`${this.devicesUrl}/${id}`).pipe(
-      map(() => true),
-      catchError(() => of(false))
-    );
+    this.devices = this.devices.filter(item => String(item.id) !== id);
+    return of(true);
   }
 
   toggleDevice(id: string): Observable<Device> {
-    return this.http.post<DeviceResponse>(`${this.devicesUrl}/${id}/toggle`, {}).pipe(
-      map(response => this.mapToDevice(response))
-    );
+    this.devices = this.devices.map(item => {
+      if (String(item.id) !== id) return item;
+      const nextActive = !(item.active ?? item.isActive);
+      return {
+        ...item,
+        active: nextActive,
+        isActive: nextActive,
+        status: nextActive ? 'ON' : 'OFF',
+        lastActive: new Date().toISOString()
+      };
+    });
+
+    const device = this.devices.find(item => String(item.id) === id);
+    return of(this.mapToDevice(device ?? this.devices[0]));
   }
 
   private mapToDevice(response: DeviceResponse): Device {

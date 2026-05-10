@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
 import { AuthRepository, UserRepository } from '../../domain/model/repositories/auth.repository';
 import { LoginCredentials } from '../../domain/model/value-objects/login-credentials.value-object';
 import { TokenPair } from '../../domain/model/entities/token-pair.entity';
@@ -58,116 +57,86 @@ export interface RegisterCommandDto {
   providedIn: 'root'
 })
 export class UserRepositoryImpl implements UserRepository, AuthRepository {
-  private readonly iamUrl = apiGatewayUrl('auth');
-
   constructor(private readonly http: HttpClient) {}
 
   findByEmail(email: string): Observable<User | null> {
-    return this.http.get<UserResponse>(`${this.iamUrl}/users/email/${email}`).pipe(
-      map(response => this.mapToUser(response)),
-      catchError(() => of(null))
-    );
+    return of(this.mockUser({ email }));
   }
 
   findById(id: string): Observable<User | null> {
-    return this.http.get<UserResponse>(`${this.iamUrl}/users/${id}`).pipe(
-      map(response => this.mapToUser(response)),
-      catchError(() => of(null))
-    );
+    return of(this.mockUser({ id }));
   }
 
   findByUsername(username: string): Observable<User | null> {
-    return this.http.get<UserResponse>(`${this.iamUrl}/users/username/${username}`).pipe(
-      map(response => this.mapToUser(response)),
-      catchError(() => of(null))
-    );
+    return of(this.mockUser({ email: username }));
   }
 
   save(user: User): Observable<User> {
-    return this.http.put<UserResponse>(`${this.iamUrl}/users/${user.id}`, this.mapToUserResponse(user)).pipe(
-      map(response => this.mapToUser(response))
-    );
+    return of(user);
   }
 
   existsByEmail(email: string): Observable<boolean> {
-    return this.http.get<{ exists: boolean }>(`${this.iamUrl}/users/email/${email}/exists`).pipe(
-      map(response => response.exists),
-      catchError(() => of(false))
-    );
+    return of(false);
   }
 
   login(credentials: LoginCredentials): Observable<{ user: User; tokens: TokenPair }> {
-    return this.http.post<LoginResponse>(`${this.iamUrl}/authentication/sign-in`, {
-      email: credentials.username,
-      password: credentials.password
-    }).pipe(
-      map(response => ({
-        user: this.mapToUser(response.user),
-        tokens: this.mapToTokenPair(response)
-      }))
-    );
+    return of({
+      user: this.mockUser({ email: credentials.username }),
+      tokens: this.mockTokenPair()
+    });
   }
 
   register(command: RegisterCommandDto): Observable<{ user: User; tokens: TokenPair }> {
-    const request = {
-      email: command.email,
-      password: command.password,
-      name: command.firstName,
-      firstName: command.firstName,
-      lastName: command.lastName,
-      phone: command.phoneNumber.replace(/\s+/g, ''),
-      address: command.address
-    };
-
-    return this.http.post<LoginResponse | UserResponse>(`${this.iamUrl}/authentication/sign-up`, request).pipe(
-      map(response => {
-        const loginResponse = response as LoginResponse;
-        if (!loginResponse.user || !this.extractAccessToken(loginResponse)) {
-          throw new Error('Registration completed without login session');
-        }
-
-        return {
-          user: this.mapToUser(loginResponse.user),
-          tokens: this.mapToTokenPair(loginResponse)
-        };
+    return of({
+      user: this.mockUser({
+        email: command.email,
+        firstName: command.firstName,
+        lastName: command.lastName,
+        phoneNumber: command.phoneNumber,
+        address: command.address
       }),
-      catchError(error => {
-        if (error?.message === 'Registration completed without login session') {
-          return this.login(new LoginCredentials(command.email, command.password));
-        }
-
-        throw error;
-      })
-    );
+      tokens: this.mockTokenPair()
+    });
   }
 
   logout(token: string): Observable<void> {
-    return this.http.post<void>(`${this.iamUrl}/auth/logout`, { token });
+    return of(undefined);
   }
 
   refreshToken(refreshToken: string): Observable<TokenPair> {
-    return this.http.post<TokenResponse>(`${this.iamUrl}/auth/refresh`, { refreshToken }).pipe(
-      map(response => this.mapToTokenPair(response))
-    );
+    return of(this.mockTokenPair());
   }
 
   validateToken(token: string): Observable<boolean> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<{ valid: boolean }>(`${this.iamUrl}/auth/validate`, { headers }).pipe(
-      map(response => response.valid),
-      catchError(() => of(false))
-    );
+    return of(true);
   }
 
   resetPassword(email: string): Observable<void> {
-    return this.http.post<void>(`${this.iamUrl}/auth/reset-password`, { email });
+    return of(undefined);
   }
 
   changePassword(userId: string, oldPassword: string, newPassword: string): Observable<void> {
-    return this.http.put<void>(`${this.iamUrl}/users/${userId}/password`, {
-      oldPassword,
-      newPassword
+    return of(undefined);
+  }
+
+  private mockUser(overrides: Partial<UserResponse> = {}): User {
+    return this.mapToUser({
+      id: overrides.id ?? 1,
+      email: overrides.email ?? 'demo@sems.app',
+      firstName: overrides.firstName ?? 'Usuario',
+      lastName: overrides.lastName ?? 'Demo',
+      role: overrides.role ?? 'USER',
+      isActive: overrides.isActive ?? true,
+      createdAt: overrides.createdAt ?? new Date().toISOString(),
+      lastLogin: overrides.lastLogin ?? new Date().toISOString(),
+      phoneNumber: overrides.phoneNumber ?? '999999999',
+      address: overrides.address ?? 'Lima, Peru',
+      profilePhotoUrl: overrides.profilePhotoUrl
     });
+  }
+
+  private mockTokenPair(): TokenPair {
+    return new TokenPair('mock-access-token', 'mock-refresh-token', 86400, 'Bearer');
   }
 
   private mapToUser(response: UserResponse): User {

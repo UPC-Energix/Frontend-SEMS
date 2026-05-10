@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
+import { Observable, of } from 'rxjs';
 import {
   CheckoutSessionResponse,
   PaymentResponse,
@@ -18,41 +17,56 @@ import {
   providedIn: 'root'
 })
 export class PaymentResource {
-  private readonly billingUrl = apiGatewayUrl('billing');
-
   constructor(private readonly http: HttpClient) { }
 
   createCheckoutSession(request: CreateCheckoutSessionRequest): Observable<CheckoutSessionResponse> {
-    return this.http.post<CheckoutSessionResponse>(
-      `${this.billingUrl}/stripe/checkout-sessions`,
-      request.toJson()
-    );
+    const body = request.toJson() as { amount?: number };
+    return of({
+      id: `checkout-${Date.now()}`,
+      url: '/payment-success',
+      amount: body.amount ?? 0
+    });
   }
 
   getPaymentHistory(userId: string): Observable<PaymentHistoryResponse> {
-    return this.http.get<PaymentHistoryResponse>(
-      `${this.billingUrl}/payments/history/${userId}`
-    );
+    return of({
+      payments: [
+        {
+          id: 'pay-1',
+          userId,
+          amount: 49.9,
+          currency: 'USD',
+          status: 'paid',
+          paymentIntentId: 'pi_mock',
+          description: 'Plan SEMS',
+          createdAt: new Date().toISOString()
+        }
+      ]
+    });
   }
 
   getPaymentById(paymentId: string): Observable<PaymentResponse> {
-    return this.http.get<PaymentResponse>(
-      `${this.billingUrl}/payments/${paymentId}`
-    );
+    return of({
+      id: paymentId,
+      userId: '1',
+      amount: 49.9,
+      currency: 'USD',
+      status: 'paid',
+      paymentIntentId: 'pi_mock',
+      description: 'Plan SEMS',
+      createdAt: new Date().toISOString()
+    });
   }
 
   createPaymentIntent(request: CreatePaymentIntentRequest): Observable<PaymentIntentResponse> {
-    return this.http.post<PaymentIntentResponse>(
-      `${this.billingUrl}/payments/intents`,
-      request.toJson()
-    );
+    return of({
+      clientSecret: 'mock-client-secret',
+      paymentIntentId: `pi-${Date.now()}`
+    });
   }
 
   confirmPayment(request: ConfirmPaymentRequest): Observable<any> {
-    return this.http.post<any>(
-      `${this.billingUrl}/payments/confirmations`,
-      request.toJson()
-    );
+    return of({ success: true });
   }
 }
 

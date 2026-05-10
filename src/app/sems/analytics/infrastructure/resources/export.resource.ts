@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { apiGatewayUrl } from '../../../../core/config/api-gateway.config';
+import { Observable, of } from 'rxjs';
 import { 
   ExportDownloadRequest, 
   ExportEmailRequest, 
@@ -19,40 +18,37 @@ import {
   providedIn: 'root'
 })
 export class ExportResource {
-  private readonly reportsUrl = apiGatewayUrl('reports');
-
   constructor(private http: HttpClient) {}
 
   createExportRequest(reportId: string, format: string): Observable<ExportResponse> {
-    const request = { reportId, format };
-    return this.http.post<ExportResponse>(`${this.reportsUrl}/exports`, request);
+    return of(this.mockExport(reportId, format));
   }
 
   getExportStatus(request: ExportStatusRequest): Observable<ExportResponse> {
-    return this.http.get<ExportResponse>(`${this.reportsUrl}/exports/${request.exportId}/status`);
+    return of(this.mockExport(request.exportId, 'pdf'));
   }
 
   downloadReport(request: ExportDownloadRequest): Observable<Blob> {
-    const params = new HttpParams()
-      .set('format', request.format)
-      .set('userId', request.userId || '');
-
-    return this.http.get(`${this.reportsUrl}/${request.reportId}/download`, {
-      params,
-      responseType: 'blob'
-    });
+    return of(new Blob(['Reporte SEMS simulado'], { type: 'text/plain' }));
   }
 
   getDownloadUrl(request: ExportDownloadRequest): Observable<ExportDownloadResponse> {
-    const params = new HttpParams()
-      .set('format', request.format)
-      .set('userId', request.userId || '');
-
-    return this.http.get<ExportDownloadResponse>(`${this.reportsUrl}/${request.reportId}/download-url`, { params });
+    return of({
+      fileName: `reporte-sems.${request.format}`,
+      contentType: 'application/octet-stream',
+      fileSize: 1024,
+      downloadUrl: '#',
+      expiresAt: new Date(Date.now() + 3600000).toISOString()
+    });
   }
 
   sendReportByEmail(request: ExportEmailRequest): Observable<ExportEmailResponse> {
-    return this.http.post<ExportEmailResponse>(`${this.reportsUrl}/send-email`, request);
+    return of({
+      success: true,
+      messageId: `msg-${Date.now()}`,
+      sentAt: new Date().toISOString(),
+      recipients: [request.email]
+    });
   }
 
   getExportHistory(request?: ExportHistoryRequest): Observable<ExportHistoryResponse> {
@@ -67,10 +63,39 @@ export class ExportResource {
       if (request.offset) params = params.set('offset', request.offset.toString());
     }
 
-    return this.http.get<ExportHistoryResponse>(`${this.reportsUrl}/exports`, { params });
+    return of({
+      exports: [this.mockExport('report-1', 'pdf')],
+      total: 1,
+      page: 1,
+      limit: request?.limit ?? 10,
+      hasNextPage: false
+    });
   }
 
   cancelExport(exportId: string): Observable<{ success: boolean }> {
-    return this.http.put<{ success: boolean }>(`${this.reportsUrl}/exports/${exportId}/cancel`, {});
+    return of({ success: true });
+  }
+
+  private mockExport(reportId: string, format: string): ExportResponse {
+    return {
+      id: `export-${Date.now()}`,
+      reportId,
+      format,
+      period: 'last_week',
+      requestedAt: new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+      status: 'completed',
+      downloadUrl: '#',
+      metadata: {
+        fileName: `reporte-sems.${format}`,
+        fileSize: 1024,
+        downloadUrl: '#',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+        language: 'es',
+        includeCharts: true,
+        includeSummary: true,
+        contentType: 'application/octet-stream'
+      }
+    };
   }
 }
