@@ -7,7 +7,7 @@ import { StatsCard } from '../../components/stats-card/stats-card';
 import { DailyChart } from '../../components/daily-chart/daily-chart';
 import { CategoryChart } from '../../components/category-chart/category-chart';
 import { MonthlyChart } from '../../components/monthly-chart/monthly-chart';
-import { DeviceList } from '../../components/device-list/device-list';
+import { DeviceList } from '../../../../device-management/presentation/components/device-list/device-list';
 import { Device, DeviceStatus } from '../../../../device-management/domain/model/device.entity';
 import { DailyConsumption } from '../../../domain/model/entities/daily-consumption.entity';
 import { ConsumptionByCategory } from '../../../domain/model/entities/consumption-by-category.entity';

@@ -10,6 +10,7 @@ import { DEVICE_PREFERENCE_REPOSITORY_PROVIDER } from './sems/device-management/
 import {provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,7 +23,8 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(
       TranslateModule.forRoot({
         defaultLanguage: 'es'
-      })
+      }),
+      MatSnackBarModule
     ),
     DEVICE_REPOSITORY_PROVIDER,
     DEVICE_PREFERENCE_REPOSITORY_PROVIDER
