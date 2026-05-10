@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { TranslateService } from '@ngx-translate/core';
-import { AuthControllerService } from '../../../../sems/authentication/application/services/auth-controller.service';
+import { AuthControllerService } from '../../../../sems/iam/application/services/auth-controller.service';
 
 interface MenuItem {
   labelKey: string;

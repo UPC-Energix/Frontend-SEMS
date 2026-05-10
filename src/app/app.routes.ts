@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { publicGuard } from './core/guards/public.guard';
 
 export const routes: Routes = [
   {
@@ -8,6 +10,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
+    canActivate: [publicGuard],
     children: [
       {
         path: 'login',
@@ -15,7 +18,7 @@ export const routes: Routes = [
         children: [
           {
             path: '',
-            loadComponent: () => import('./sems/authentication/presentation/views/login/login').then(m => m.Login)
+            loadComponent: () => import('./sems/iam/presentation/views/login/login').then(m => m.Login)
           }
         ]
       },
@@ -25,7 +28,7 @@ export const routes: Routes = [
         children: [
           {
             path: '',
-            loadComponent: () => import('./sems/authentication/presentation/views/register/register').then(m => m.Register)
+            loadComponent: () => import('./sems/iam/presentation/views/register/register').then(m => m.Register)
           }
         ]
       }
@@ -33,71 +36,74 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    canActivate: [publicGuard],
     loadComponent: () => import('./shared/presentation/layouts/layout-login/layout-login').then(m => m.LayoutLogin),
     children: [
       {
         path: '',
-        loadComponent: () => import('./sems/authentication/presentation/views/login/login').then(m => m.Login)
+        loadComponent: () => import('./sems/iam/presentation/views/login/login').then(m => m.Login)
       }
     ]
   },
   {
     path: 'register',
+    canActivate: [publicGuard],
     loadComponent: () => import('./shared/presentation/layouts/layout-login/layout-login').then(m => m.LayoutLogin),
     children: [
       {
         path: '',
-        loadComponent: () => import('./sems/authentication/presentation/views/register/register').then(m => m.Register)
+        loadComponent: () => import('./sems/iam/presentation/views/register/register').then(m => m.Register)
       }
     ]
   },
   {
     path: '',
+    canActivate: [authGuard],
     loadComponent: () => import('./shared/presentation/layouts/layout-home/layout-home').then(m => m.LayoutHome),
     children: [
       {
         path: 'home',
-        loadComponent: () => import('./sems/energy-management/presentation/views/home/home').then(m => m.Home)
+        loadComponent: () => import('./sems/energy-monitoring/presentation/views/home/home').then(m => m.Home)
       },
       {
         path: 'profile',
-        loadComponent: () => import('./sems/energy-management/presentation/views/profile/profile').then(m => m.ProfileComponent)
+        loadComponent: () => import('./sems/iam/presentation/views/profile/profile').then(m => m.ProfileComponent)
       },
       {
         path: 'devices',
-        loadComponent: () => import('./sems/energy-management/presentation/views/devices/devices').then(m => m.Devices)
+        loadComponent: () => import('./sems/device-management/presentation/views/devices/devices').then(m => m.Devices)
       },
       {
         path: 'devices/add',
-        loadComponent: () => import('./sems/energy-management/presentation/views/add-device/add-device').then(m => m.AddDevice)
+        loadComponent: () => import('./sems/device-management/presentation/views/add-device/add-device').then(m => m.AddDevice)
       },
       {
         path: 'device-preferences',
-        loadComponent: () => import('./sems/energy-management/presentation/views/device-preferences/device-preferences').then(m => m.DevicePreferences)
+        loadComponent: () => import('./sems/device-management/presentation/views/device-preferences/device-preferences').then(m => m.DevicePreferences)
       },
       {
         path: 'reports',
-        loadComponent: () => import('./sems/energy-management/presentation/views/reports/reports').then(m => m.Reports)
+        loadComponent: () => import('./sems/analytics/presentation/views/reports/reports').then(m => m.Reports)
       },
       {
         path: 'settings',
-        loadComponent: () => import('./sems/energy-management/presentation/views/settings/settings').then(m => m.Settings)
+        loadComponent: () => import('./sems/alerts/presentation/views/settings/settings').then(m => m.Settings)
       },
       {
         path: 'settings-suports',
-        loadComponent: () => import('./sems/energy-management/presentation/views/settings-suports/settings-suports').then(m => m.SettingsSuports)
+        loadComponent: () => import('./sems/alerts/presentation/views/settings-suports/settings-suports').then(m => m.SettingsSuports)
       },
       {
         path: 'payments',
-        loadComponent: () => import('./sems/payments/presentation/views/payments/payments').then(m => m.Payments)
+        loadComponent: () => import('./sems/billing/presentation/views/payments/payments').then(m => m.Payments)
       },
       {
         path: 'payment-success',
-        loadComponent: () => import('./sems/payments/presentation/views/payment-success/payment-success').then(m => m.PaymentSuccess)
+        loadComponent: () => import('./sems/billing/presentation/views/payment-success/payment-success').then(m => m.PaymentSuccess)
       },
       {
         path: 'payment-cancel',
-        loadComponent: () => import('./sems/payments/presentation/views/payment-cancel/payment-cancel').then(m => m.PaymentCancel)
+        loadComponent: () => import('./sems/billing/presentation/views/payment-cancel/payment-cancel').then(m => m.PaymentCancel)
       }
     ]
   },
