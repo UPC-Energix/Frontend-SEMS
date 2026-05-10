@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration } from 'chart.js';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Device } from '../../../domain/model/device.entity';
+import { Device } from '../../../../device-management/domain/model/device.entity';
 
 interface HourlyConsumption {
   hour: string;
