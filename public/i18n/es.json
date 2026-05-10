@@ -427,8 +427,54 @@
     }
   },
   "payments": {
-    "title": "Pagos",
-    "subtitle": "Gestiona tus pagos de facturas de energía",
+    "title": "Pagos y Suscripciones",
+    "subtitle": "Elige tu plan SEMS y gestiona tus pagos de energia",
+    "subscriptions": {
+      "title": "Suscripciones",
+      "subtitle": "Selecciona el plan que se adapte a tu monitoreo energetico",
+      "recommended": "Recomendado",
+      "select": "Seleccionar plan",
+      "selected": "Seleccionado",
+      "currentSelection": "Plan seleccionado",
+      "periods": {
+        "month": "mes"
+      },
+      "messages": {
+        "freeSelected": "Plan gratis seleccionado.",
+        "freeActivated": "Suscripcion gratis activada."
+      },
+      "plans": {
+        "free": {
+          "title": "Gratis",
+          "subtitle": "Empieza a monitorear sin costo",
+          "features": {
+            "monitoring": "Dashboard basico de energia",
+            "alerts": "Alertas esenciales de consumo",
+            "devices": "Hasta 3 dispositivos vinculados"
+          }
+        },
+        "plus": {
+          "title": "Plus",
+          "subtitle": "Para hogares activos",
+          "features": {
+            "free": "Todo lo del plan Gratis",
+            "analytics": "Analisis detallado por dispositivo",
+            "recommendations": "Recomendaciones personalizadas de ahorro",
+            "reports": "Reportes mensuales de ahorro"
+          }
+        },
+        "pro": {
+          "title": "Pro",
+          "subtitle": "Control e informacion avanzada",
+          "features": {
+            "plus": "Todo lo del plan Plus",
+            "devices": "Dispositivos vinculados ilimitados",
+            "priority": "Soporte prioritario",
+            "export": "Exportacion avanzada de reportes"
+          }
+        }
+      }
+    },
     "form": {
       "title": "Realizar Pago",
       "estimatedBill": "Factura Estimada",
@@ -448,6 +494,7 @@
       "noPayments": "No hay pagos registrados",
       "status": {
         "succeeded": "Exitoso",
+        "paid": "Pagado",
         "pending": "Pendiente",
         "failed": "Fallido",
         "completed": "Completado"

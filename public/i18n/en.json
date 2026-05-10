@@ -427,8 +427,54 @@
     }
   },
   "payments": {
-    "title": "Payments",
-    "subtitle": "Manage your energy bill payments",
+    "title": "Payments & Subscriptions",
+    "subtitle": "Choose your SEMS plan and manage your energy bill payments",
+    "subscriptions": {
+      "title": "Subscriptions",
+      "subtitle": "Select the plan that fits your energy monitoring needs",
+      "recommended": "Recommended",
+      "select": "Select plan",
+      "selected": "Selected",
+      "currentSelection": "Selected plan",
+      "periods": {
+        "month": "month"
+      },
+      "messages": {
+        "freeSelected": "Free plan selected.",
+        "freeActivated": "Free subscription activated."
+      },
+      "plans": {
+        "free": {
+          "title": "Free",
+          "subtitle": "Start monitoring at no cost",
+          "features": {
+            "monitoring": "Basic energy dashboard",
+            "alerts": "Essential consumption alerts",
+            "devices": "Up to 3 linked devices"
+          }
+        },
+        "plus": {
+          "title": "Plus",
+          "subtitle": "For active homes",
+          "features": {
+            "free": "Everything in Free",
+            "analytics": "Detailed device analytics",
+            "recommendations": "Personalized saving recommendations",
+            "reports": "Monthly savings reports"
+          }
+        },
+        "pro": {
+          "title": "Pro",
+          "subtitle": "Advanced control and insights",
+          "features": {
+            "plus": "Everything in Plus",
+            "devices": "Unlimited linked devices",
+            "priority": "Priority support",
+            "export": "Advanced report export"
+          }
+        }
+      }
+    },
     "form": {
       "title": "Make Payment",
       "estimatedBill": "Estimated Bill",
@@ -448,6 +494,7 @@
       "noPayments": "No payments recorded",
       "status": {
         "succeeded": "Successful",
+        "paid": "Paid",
         "pending": "Pending",
         "failed": "Failed",
         "completed": "Completed"
