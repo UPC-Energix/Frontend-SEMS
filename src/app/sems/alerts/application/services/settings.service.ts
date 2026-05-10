@@ -6,6 +6,7 @@ import { SettingsRepositoryImpl } from '../../infrastructure/repositories/settin
 import { SettingsStore } from '../state/settings.store';
 import { SettingsAssembler } from '../../infrastructure/assemblers/settings.assembler';
 import { SettingsResource, SavingRule } from '../../infrastructure/resources/settings.resource';
+import { SettingsResponse } from '../../infrastructure/response/settings.response';
 
 @Injectable({
   providedIn: 'root'
@@ -19,21 +20,21 @@ export class SettingsService {
 
   loadUserSettings(userId: string): Observable<SettingsResource> {
     return this.repo.getUserSettings(userId).pipe(
-      map(dto => this.assembler.toResource(dto)),
-      tap(res => this.store.updateActiveSettings(res))
+      map((dto: SettingsResponse) => this.assembler.toResource(dto)),
+      tap((res: SettingsResource) => this.store.updateActiveSettings(res))
     );
   }
 
   updateSettings(userId: string, resource: Partial<SettingsResource>): Observable<SettingsResource> {
     const req = this.assembler.toRequest(resource);
     return this.repo.updateSettings(userId, req).pipe(
-      map(dto => {
+      map((dto: SettingsResponse) => {
         const responseResource = this.assembler.toResource(dto);
         // Optimistic update: Merge request data over response to ensure UI reflects changes
         // even if backend returns stale data.
         return { ...responseResource, ...resource };
       }),
-      tap(res => this.store.updateActiveSettings(res))
+      tap((res: SettingsResource) => this.store.updateActiveSettings(res))
     );
   }
 
@@ -51,8 +52,8 @@ export class SettingsService {
 
   resetToDefaults(userId: string): Observable<SettingsResource> {
     return this.repo.resetToDefaults(userId).pipe(
-      map(dto => this.assembler.toResource(dto)),
-      tap(res => this.store.updateActiveSettings(res))
+      map((dto: SettingsResponse) => this.assembler.toResource(dto)),
+      tap((res: SettingsResource) => this.store.updateActiveSettings(res))
     );
   }
 
